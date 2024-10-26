@@ -1,8 +1,18 @@
 from reportlab.lib import colors
 from reportlab.graphics.shapes import (Drawing, Rect,
                                        Circle, String)
+
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
 import json
 import os
+
+
+registerFont(TTFont("FiraSans", "assets/FiraSans-Regular.ttf"))
+
+registerFont(TTFont("FiraSans-Bold", "assets/FiraSans-Bold.ttf"))
+
+
 
 OUT_DIR = "grafica"
 DATA_DIR = "data"
@@ -61,13 +71,15 @@ def draw_name_and_username(drawing: Drawing,
     name = String(x + xmargin, y - ymargin, 
                   user['name'], 
                   fontSize=28,
-                  textRenderMode=BOLDFACE_MODE,
+                  fontName="FiraSans-Bold",
+                #   textRenderMode=BOLDFACE_MODE,
                   fillColor=colors.white,
                   strokeColor=colors.white)
     y = name.getBounds()[1]
     username = String(x + xmargin, y - ymargin, 
                   "@" + user['username'], 
                   fontSize=28,
+                  fontName="FiraSans",
                   fillColor=colors.white,
                   strokeColor=colors.white)
 
@@ -76,12 +88,13 @@ def draw_name_and_username(drawing: Drawing,
     lines = msg.split("\n")
     texts = []
     for line in lines:
-        mul = 0.8 if texts else 2
+        mul = 0.8 if texts else 1.8
         since = String(x + xmargin,
                     y - int(mul * ymargin),
                     line,
                     fontSize=24,
-                    textRenderMode=BOLDFACE_MODE,
+                    fontName="FiraSans-Bold",
+                    # textRenderMode=BOLDFACE_MODE,
                     fillColor=colors.white,
                     strokeColor=colors.white)
         y = since.getBounds()[1]
