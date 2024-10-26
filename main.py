@@ -1,7 +1,11 @@
+from reportlab.pdfgen import canvas
+from reportlab.graphics import renderPDF
 from reportlab.lib import colors
 from reportlab.graphics.shapes import (Drawing, Rect,
-                                       Circle, String)
+                                       Circle, String,
+                                       Image)
 
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
 import json
@@ -46,7 +50,7 @@ def draw_background(drawing,
     drawing.add(inner_rect)
     return inner_rect.getBounds()
 
-def draw_profile_picture(drawing: Drawing):
+def draw_profile_frame(drawing: Drawing):
     w = drawing.width
     h = drawing.height
     cx = w // 4
@@ -56,7 +60,7 @@ def draw_profile_picture(drawing: Drawing):
            strokeColor=PG_COLORS["green"],
            fillColor=PG_COLORS["green"])
     drawing.add(circ_frame)
-    # TODO: adicionar foto
+
     return circ_frame.getBounds()
 
 def draw_name_and_username(drawing: Drawing, 
@@ -106,23 +110,42 @@ def draw_name_and_username(drawing: Drawing,
         drawing.add(elem)
     
     return texts[-1].getBounds()
-
-# def draw_fan_text(drawing: Drawing,
-#                   x, y, 
-#                   margin=(16, 32)):
+    
+def draw_profile_picture(mycanva: canvas.Canvas, 
+                         framebb, margin=16):
+    mycanva.drawImage("assets/avatar_cropped.png", 
+                      framebb[0] + margin // 2, 
+                      framebb[1] + margin // 2, 
+                      framebb[2] - framebb[0] - margin, 
+                      framebb[3] - framebb[1] - margin, 
+                      mask=(0, 1, 0, 1, 0, 1))
+    
+    mycanva.drawImage("assets/logo_cropped.png", 
+                      framebb[2] - 4 * margin, 
+                      framebb[1], 
+                      64, 
+                      64, 
+                      mask=(0, 1, 0, 1, 0, 1))
     
 
-
 if __name__ == '__main__':
+    mycanva = canvas.Canvas(
+        os.path.join(OUT_DIR, "carteirinha.pdf"),
+        (WIDTH, HEIGHT))
     drawing = Drawing(WIDTH, HEIGHT)
     # desenha o fundo
     draw_background(drawing)
-    # desenha foto do fã
-    bbox = draw_profile_picture(drawing)
+    # desenha o quadro cirular para foto
+    bbox = draw_profile_frame(drawing)
     # adiciona nome e nick
     draw_name_and_username(drawing, bbox[2], bbox[3])
-    # adiciona 'desde de...'
-
+    # coloca todos os elementos de drawing no PDF
+    renderPDF.draw(drawing, mycanva, 0, 0)
+    # adiciona a foto
+    draw_profile_picture(mycanva, bbox)
+    
     # salva
-    drawing.save(formats=['pdf', 'png'], 
-                outDir=OUT_DIR, fnRoot="carteirinha")
+    # drawing.save(formats=['pdf', 'png'], 
+                # outDir=OUT_DIR, fnRoot="carteirinha")
+    mycanva.save()
+    print("Carteirinha gerada com sucesso!")
