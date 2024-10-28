@@ -2,3 +2,5 @@
 */.DS_Store
 venv/*
 grafica/*
+token.txt
+__pycache__/*

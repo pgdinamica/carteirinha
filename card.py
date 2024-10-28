@@ -1,3 +1,4 @@
+from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.graphics import renderPDF
 from reportlab.lib import colors
@@ -8,6 +9,7 @@ from reportlab.graphics.shapes import (Drawing, Rect,
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
+from PIL import Image as PILImage
 import json
 import os
 
@@ -63,12 +65,10 @@ def draw_profile_frame(drawing: Drawing):
 
     return circ_frame.getBounds()
 
-def draw_name_and_username(drawing: Drawing, 
+def draw_name_and_username(drawing: Drawing, user,
                            x, y, 
                            margin=(16, 32)):
-    with open(os.path.join(DATA_DIR, "user.json"), "r") as userfile:
-        content = userfile.read()
-        user = json.loads(content)
+    
     
     xmargin = margin[0]
     ymargin = margin[1]
@@ -111,9 +111,9 @@ def draw_name_and_username(drawing: Drawing,
     
     return texts[-1].getBounds()
     
-def draw_profile_picture(mycanva: canvas.Canvas, 
+def draw_profile_picture(image, mycanva: canvas.Canvas, 
                          framebb, margin=16):
-    mycanva.drawImage("assets/avatar_cropped.png", 
+    mycanva.drawImage(image,#"assets/avatar_cropped.png", 
                       framebb[0] + margin // 2, 
                       framebb[1] + margin // 2, 
                       framebb[2] - framebb[0] - margin, 
@@ -127,25 +127,53 @@ def draw_profile_picture(mycanva: canvas.Canvas,
                       64, 
                       mask=(0, 1, 0, 1, 0, 1))
     
-
-if __name__ == '__main__':
-    mycanva = canvas.Canvas(
-        os.path.join(OUT_DIR, "carteirinha.pdf"),
-        (WIDTH, HEIGHT))
+def make_carteirinha(user, image, fileoutput):
+    mycanva = canvas.Canvas(fileoutput, (WIDTH, HEIGHT))
     drawing = Drawing(WIDTH, HEIGHT)
     # desenha o fundo
     draw_background(drawing)
     # desenha o quadro cirular para foto
     bbox = draw_profile_frame(drawing)
     # adiciona nome e nick
-    draw_name_and_username(drawing, bbox[2], bbox[3])
+    draw_name_and_username(drawing, user, bbox[2], bbox[3])
     # coloca todos os elementos de drawing no PDF
     renderPDF.draw(drawing, mycanva, 0, 0)
     # adiciona a foto
-    draw_profile_picture(mycanva, bbox)
+    draw_profile_picture(image, mycanva, bbox)
     
-    # salva
-    # drawing.save(formats=['pdf', 'png'], 
-                # outDir=OUT_DIR, fnRoot="carteirinha")
     mycanva.save()
-    print("Carteirinha gerada com sucesso!")
+    if isinstance(fileoutput, BytesIO):
+        fileoutput.seek(0)
+    return fileoutput
+    
+
+if __name__ == '__main__':
+    with open(os.path.join(DATA_DIR, "user.json"), "r") as userfile:
+        content = userfile.read()
+        user = json.loads(content)
+    img = ImageReader(PILImage.open("assets/avatar_cropped.png"))
+    make_carteirinha(user, img, os.path.join(OUT_DIR, "teste.pdf"))
+
+    # mycanva = canvas.Canvas(
+    #     os.path.join(OUT_DIR, "carteirinha.pdf"),
+    #     (WIDTH, HEIGHT))
+    # drawing = Drawing(WIDTH, HEIGHT)
+    # # desenha o fundo
+    # draw_background(drawing)
+    # # desenha o quadro cirular para foto
+    # bbox = draw_profile_frame(drawing)
+    # # adiciona nome e nick
+    # with open(os.path.join(DATA_DIR, "user.json"), "r") as userfile:
+    #     content = userfile.read()
+    #     user = json.loads(content)
+    # draw_name_and_username(drawing, user, bbox[2], bbox[3])
+    # # coloca todos os elementos de drawing no PDF
+    # renderPDF.draw(drawing, mycanva, 0, 0)
+    # # adiciona a foto
+    # draw_profile_picture(mycanva, bbox)
+    
+    # # salva
+    # # drawing.save(formats=['pdf', 'png'], 
+    #             # outDir=OUT_DIR, fnRoot="carteirinha")
+    # mycanva.save()
+    # print("Carteirinha gerada com sucesso!")
