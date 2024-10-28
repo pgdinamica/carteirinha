@@ -111,7 +111,7 @@ def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
     with open("token.txt") as tokenfile:
-        token = tokenfile.read()
+        token = tokenfile.read().strip()
     application = Application.builder().token(token).build()
 
     # on different commands - answer in Telegram
