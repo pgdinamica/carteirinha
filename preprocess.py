@@ -33,8 +33,8 @@ def crop_circle(img):
 
 def limit_img_size(img:Image, limit=1024):
     width, height = img.size
-    if max(width, height) < limit:
-        limit = max(width, height)
+    if min(width, height) < limit:
+        limit = min(width, height)
     left = (width - limit) // 2
     top = (height - limit) // 2
     right = (width + limit) // 2
