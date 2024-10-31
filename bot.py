@@ -52,7 +52,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
 
     answer = """Comandos:\n
-    digite /carteirinha <nome> <username_youtube> <ano_que_virou_fã>
+    *Gere a sua carteirinha de fã:*
+    /carteirinha <nome> <username_youtube> <ano_que_virou_fã>\n
+    /blackfriday - receba desconto! 
+    /aprender - desenvolva um bot como este.
     """
     await update.message.reply_text(answer)
 
@@ -64,7 +67,18 @@ async def unknown(update: Update,
     answer = """Não entendi, mas você pode se inscrever no canal Programação Dinâmica e aprender sobre programação, ciência de dados e inteligência artificial com o Hallison e com a Kizzy!"""
 
     await update.message.reply_text(answer)
+
+async def promo(update: Update, 
+                  context: ContextTypes.DEFAULT_TYPE):
+    response = "Olá, fã! Pela sua curiosidade e apoio ao nosso canal, estamos disponibilizando o nosso desconto de Black Friday para o curso Python do Jeito Certo 2.0 em antecipado para você! Bons estudos: https://vai.pgdinamica.com/blk24"
     
+    await update.message.reply_text(response)
+
+async def teachme(update: Update, 
+                  context: ContextTypes.DEFAULT_TYPE):
+    response = "Aprenda a desenvolver um bot como este em: https://youtu.be/sjAfQoVm_fw?si=_06q-s5XIKfvCJ09"
+    
+    await update.message.reply_text(response)
 
 async def membercard(update: Update, 
                      context: ContextTypes.DEFAULT_TYPE):
@@ -119,6 +133,8 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(
         CommandHandler("carteirinha", membercard))
+    application.add_handler(CommandHandler("blackfriday", promo))
+    application.add_handler(CommandHandler("aprender", teachme))
     application.add_handler(
         MessageHandler(filters.PHOTO, handle_photo))
 
