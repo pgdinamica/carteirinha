@@ -1,0 +1,14 @@
+anyio==4.6.2.post1
+certifi==2024.8.30
+chardet==5.2.0
+freetype-py==2.3.0
+h11==0.14.0
+httpcore==1.0.6
+httpx==0.27.2
+idna==3.10
+pillow==11.0.0
+pycairo==1.27.0
+python-telegram-bot==21.6
+reportlab==4.2.5
+rlPyCairo==0.3.0
+sniffio==1.3.1
